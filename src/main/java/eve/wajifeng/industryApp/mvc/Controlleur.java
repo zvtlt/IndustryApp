@@ -15,6 +15,7 @@ public class Controlleur extends JPanel {
     private JTextField donnee;
     private JButton search;
     private JButton update;
+    private JTextArea info;
     private JComboBox comboBox;
     private JCheckBox checkSub;
 
@@ -26,8 +27,13 @@ public class Controlleur extends JPanel {
         donnee = new JTextField();
         search = new JButton("Search");
         update = new JButton("Update Prices");
+        info = new JTextArea("For later offline uses");
         comboBox = new JComboBox(model.comboboxList.toArray());
         checkSub = new JCheckBox("Display Sub-Components ");
+
+        info.setFont(new Font("Arial", Font.BOLD, 16));
+        info.setForeground(Color.white);
+        info.setBackground(new Color(43, 43, 43));
 
         setLayout(new GridLayout(2,2));
 
@@ -37,6 +43,7 @@ public class Controlleur extends JPanel {
         firstRowLeft.add(donnee);
         firstRowLeft.add(search);
         firstRowLeft.add(update);
+        firstRowLeft.add(info);
         firstRowLeft.setBackground(new Color(43, 43, 43));
 
         JPanel firstRowRight = new JPanel(new FlowLayout(FlowLayout.RIGHT, 10,10));
@@ -129,9 +136,8 @@ public class Controlleur extends JPanel {
 
         @Override
         public void actionPerformed(ActionEvent e) {
-            model.setUpdatePrices(true);
             try {
-                model.jsonPriceUpdate(model.getComponentBlueprintList());
+                model.updateJsonEM();
             } catch (IOException IOe) {
                 IOe.printStackTrace();
             }

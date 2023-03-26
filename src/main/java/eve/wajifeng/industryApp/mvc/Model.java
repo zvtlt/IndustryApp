@@ -2,12 +2,11 @@ package eve.wajifeng.industryApp.mvc;
 
 import com.fasterxml.jackson.core.type.TypeReference;
 import com.fasterxml.jackson.databind.ObjectMapper;
-import eve.wajifeng.industryApp.json.Json;
+import eve.wajifeng.industryApp.json.EMPrices;
 import eve.wajifeng.industryApp.yaml.blueprints.Blueprints;
 import eve.wajifeng.industryApp.yaml.blueprints.Materials;
 import eve.wajifeng.industryApp.yaml.blueprints.Products;
 import eve.wajifeng.industryApp.yaml.typeIDs.TypeIDs;
-import org.springframework.web.client.RestTemplate;
 import org.w3c.dom.Document;
 import org.w3c.dom.Element;
 import org.w3c.dom.Node;
@@ -22,6 +21,8 @@ import javax.xml.parsers.DocumentBuilderFactory;
 import javax.xml.parsers.ParserConfigurationException;
 import java.io.*;
 import java.net.URL;
+import java.nio.file.Files;
+import java.nio.file.Paths;
 import java.text.DecimalFormat;
 import java.util.ArrayList;
 import java.util.List;
@@ -33,7 +34,6 @@ public class Model extends Observable {
     protected ProductedBlueprint productedBlueprint;
     protected List<ComponentBlueprint> componentBlueprintList;
     protected Total total;
-    protected boolean updatePrices = false;
     protected boolean sub = false;
     private String count = "";
 
@@ -117,6 +117,34 @@ public class Model extends Observable {
         for (Object o : yaml.loadAll(inputStream2)) {
             TypeIDs t = (TypeIDs) o;
             list.add(t);
+        }
+
+        return list;
+    }
+
+    /////////////////////// LIST OF ALL USED ID //////////
+    private List<Integer> usefullID(){
+
+        getInstance();
+        List<Integer> list = new ArrayList<>();
+
+        for(Blueprints bp : blueprintsList){
+            if(!list.contains(bp.getBlueprintTypeID()))
+                list.add(bp.getBlueprintTypeID());
+
+            if(bp.getActivities().getManufacturing() != null && bp.getActivities().getManufacturing().getProducts() != null) {
+                for (Products p : bp.getActivities().getManufacturing().getProducts()) {
+                    if(!list.contains(p.getTypeID()))
+                        list.add(p.getTypeID());
+                }
+            }
+
+            if(bp.getActivities().getManufacturing() != null && bp.getActivities().getManufacturing().getMaterials() != null) {
+                for (Materials m : bp.getActivities().getManufacturing().getMaterials()) {
+                    if(!list.contains(m.getTypeID()))
+                        list.add(m.getTypeID());
+                }
+            }
         }
 
         return list;
@@ -361,38 +389,23 @@ public class Model extends Observable {
 
 
     //////////////////////////////  JSON LIST FOR MARKET PRICE + UPDATING PRICES   //////////////////
-    protected void jsonPriceUpdate(List<ComponentBlueprint> itInfo) throws IOException {
+    private void jsonPriceUpdate(List<ComponentBlueprint> itInfo) throws IOException {
         //        JSON LIST FOR MARKET PRICE
-
-        File prices = new File("E:\\Dev\\IntelliJ\\IndustryApp\\src\\main\\resources\\json\\prices.json");
-
-        try {
-            if (!prices.exists() || updatePrices) {
-                RestTemplate restTemplate = new RestTemplate();
-                String response = restTemplate.getForObject(
-                        "https://esi.evetech.net/latest/markets/prices/?datasource=tranquility", String.class);
-
-                try (FileWriter writer = new FileWriter(prices)) {
-                    writer.write(response);
-                }
-                updatePrices = false;
-            }
-        }catch (Exception e){
-            System.out.println("Cannot update prices");
-        }
+        String userprofile = System.getenv("USERPROFILE");
+        File prices = new File(userprofile + "\\IndustryApp\\prices.json");
 
         //        UPDATING BASEPRICE, MULTPRICE AND TOTALPRICE VALUE WITH JSON
         try {
-            List<Json> list = new ObjectMapper().readValue(prices, new TypeReference<>() {
+            List<EMPrices> list = new ObjectMapper().readValue(prices, new TypeReference<>() {
             });
 
             for (ComponentBlueprint bp : itInfo) {
-                for (Json json : list) {
+                for (EMPrices json : list) {
                     if (bp.getMaterialTypeID() == json.getType_id()) {
-                        bp.setBasePrice(json.getAverage_price());
+                        bp.setBasePrice(json.getMedian_price());
                     }
                     if(productedBlueprint.getProductedTypeID() == json.getType_id()){
-                        productedBlueprint.setProductedPrice(json.getAverage_price());
+                        productedBlueprint.setProductedPrice(json.getMedian_price());
                     }
                 }
             }
@@ -415,36 +428,21 @@ public class Model extends Observable {
     //////////////////////////////  JSON LIST FOR MARKET PRICE + UPDATING PRICES FOR SUBCOMP  //////////////////
     private void jsonPriceUpdateSubComp(List<ComponentBlueprint> itInfo){
         //        JSON LIST FOR MARKET PRICE
-
-        File prices = new File("E:\\Dev\\IntelliJ\\IndustryApp\\src\\main\\resources\\json\\prices.json");
-
-        try {
-            if (!prices.exists() || updatePrices) {
-                RestTemplate restTemplate = new RestTemplate();
-                String response = restTemplate.getForObject(
-                        "https://esi.evetech.net/latest/markets/prices/?datasource=tranquility", String.class);
-
-                try (FileWriter writer = new FileWriter(prices)) {
-                    writer.write(response);
-                }
-                updatePrices = false;
-            }
-        }catch (Exception e){
-            System.out.println("Cannot update prices");
-        }
+        String userprofile = System.getenv("USERPROFILE");
+        File prices = new File(userprofile + "\\IndustryApp\\prices.json");
 
         //        UPDATING BASEPRICE, MULTPRICE AND TOTALPRICE VALUE WITH JSON
         try {
-            List<Json> list = new ObjectMapper().readValue(prices, new TypeReference<>() {
+            List<EMPrices> list = new ObjectMapper().readValue(prices, new TypeReference<>() {
             });
 
             for (ComponentBlueprint bp : itInfo) {
-                for (Json json : list) {
+                for (EMPrices json : list) {
                     if (bp.getMaterialTypeID() == json.getType_id()) {
-                        bp.setBasePrice(json.getAverage_price());
+                        bp.setBasePrice(json.getMedian_price());
                     }
                     if(productedBlueprint.getProductedTypeID() == json.getType_id()){
-                        productedBlueprint.setProductedPrice(json.getAverage_price());
+                        productedBlueprint.setProductedPrice(json.getMedian_price());
                     }
                 }
             }
@@ -567,6 +565,132 @@ public class Model extends Observable {
         }
 
         stringReader.close();
+    }
+
+
+    //////////////////////////// UPDATE JSON PRICES WITH EM ON START ///////////////////////////////
+    protected void updateJsonEM() throws IOException {
+        updateJsonEM1();
+        updateJsonEM2();
+    }
+
+
+    private void updateJsonEM1() throws IOException {
+
+        int count = 1;
+        int subcount = 1;
+        int maxcount = 200;
+        int modres;
+
+        String userprofile = System.getenv("USERPROFILE");
+        Files.createDirectories(Paths.get(userprofile + "\\IndustryApp"));
+
+        String id ="";
+
+        String url;
+        StringBuilder response = new StringBuilder();
+        response.append("[");
+        URL file;
+
+        List<Integer> list = usefullID();
+
+        for(Integer tID : list) {
+
+            modres = count%maxcount;
+
+            if(modres == 1) {
+                id += tID;
+                subcount++;
+            }else if(modres == 0){
+                id += "," + tID;
+                try {
+                    url = "https://api.evemarketer.com/ec/marketstat?typeid=" + id;
+                    file = new URL(url);
+                    DocumentBuilderFactory documentBuilderFactory = DocumentBuilderFactory.newInstance();
+                    DocumentBuilder documentBuilder = documentBuilderFactory.newDocumentBuilder();
+                    Document document = documentBuilder.parse(file.openStream());
+                    NodeList nodeList = document.getDocumentElement().getElementsByTagName("sell");
+
+                    for(int i = 0 ; i < subcount ; i++) {
+                        Node node = nodeList.item(i);
+                        Element elem = (Element) node;
+                        String res = elem.getElementsByTagName("median").item(0).getTextContent();
+                        response.append("{\"median_price\":" + res + ",\"type_id\":}," + System.lineSeparator());
+                    }
+
+                    id ="";
+                    subcount = 1;
+
+                }catch (Exception e){
+                    System.out.println("Cannot update prices in updateJsonEM()");
+                }
+            }else {
+                id += "," + tID;
+                subcount++;
+            }
+
+            count ++;
+        }
+
+        try {
+            url = "https://api.evemarketer.com/ec/marketstat?typeid=" + id;
+            file = new URL(url);
+            DocumentBuilderFactory documentBuilderFactory = DocumentBuilderFactory.newInstance();
+            DocumentBuilder documentBuilder = documentBuilderFactory.newDocumentBuilder();
+            Document document = documentBuilder.parse(file.openStream());
+            NodeList nodeList = document.getDocumentElement().getElementsByTagName("sell");
+
+            subcount = list.size()%200;
+
+            for(int i = 0 ; i < subcount ; i++) {
+                Node node = nodeList.item(i);
+                Element elem = (Element) node;
+                String res = elem.getElementsByTagName("median").item(0).getTextContent();
+
+                response.append("{\"median_price\":" + res + ",\"type_id\":}," + System.lineSeparator());
+            }
+
+        }catch (Exception e){
+            System.out.println("Cannot update prices in updateJsonEM()");
+        }
+
+        response.append("]");
+
+        File prices = new File(userprofile + "\\IndustryApp\\prices.json");
+        String res = response.substring(0, response.length() - 4) + "]";
+
+        try (FileWriter writer = new FileWriter(prices)) {
+            writer.write(res);
+        }
+    }
+
+
+    private void updateJsonEM2(){
+
+        String userprofile = System.getenv("USERPROFILE");
+        File prices = new File(userprofile + "\\IndustryApp\\prices.json");
+
+        List<Integer> list = usefullID();
+        int id = 0;
+
+        StringBuilder originalContent = new StringBuilder();
+        try (BufferedReader reader = new BufferedReader(new FileReader(prices))) {
+            String line = reader.readLine();
+            while (line != null) {
+
+                line = line.substring(0, line.length() - 2) + list.get(id) + "},";
+
+                originalContent.append(line).append(System.lineSeparator());
+                line = reader.readLine();
+                id++;
+            }
+            String newContent = originalContent.substring(0,originalContent.length() - 3) + "]";
+            try (FileWriter writer = new FileWriter(prices)) {
+                writer.write(newContent);
+            }
+        } catch (Exception e) {
+            e.printStackTrace();
+        }
     }
 
 
@@ -762,10 +886,6 @@ public class Model extends Observable {
 
     public List<ComponentBlueprint> getComponentBlueprintList() {
         return componentBlueprintList;
-    }
-
-    public void setUpdatePrices(boolean updatePrices) {
-        this.updatePrices = updatePrices;
     }
 
     public Total getTotal() {

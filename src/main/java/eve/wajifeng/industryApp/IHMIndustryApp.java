@@ -20,12 +20,14 @@ public class IHMIndustryApp extends JFrame {
         gui.add(vue, BorderLayout.CENTER);
         setContentPane(gui);
 
-        pack();
         setLocation(200, 20);
         setSize(1100, 750);
+        setMinimumSize(new Dimension(1100,750));
         setVisible(true);
 
         setDefaultCloseOperation(JFrame.EXIT_ON_CLOSE);
+
+        pack();
     }
 
 }

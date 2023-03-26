@@ -1,6 +1,8 @@
 package eve.wajifeng.industryApp;
 
+import eve.wajifeng.industryApp.mvc.Model;
 import org.apache.commons.lang.time.StopWatch;
+
 
 
 public class Test {
