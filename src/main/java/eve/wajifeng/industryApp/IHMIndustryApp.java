@@ -9,7 +9,7 @@ import java.awt.*;
 
 public class IHMIndustryApp extends JFrame {
 
-    protected IHMIndustryApp() {
+    protected IHMIndustryApp(){
         super("IndustryApp");
         Model model = Model.getInstance();
         Controlleur control = new Controlleur(model);
@@ -21,13 +21,13 @@ public class IHMIndustryApp extends JFrame {
         setContentPane(gui);
 
         setLocation(200, 20);
-        setSize(1100, 750);
-        setMinimumSize(new Dimension(1100,750));
+        setSize(1200, 750);
+        setResizable(false);
         setVisible(true);
 
         setDefaultCloseOperation(JFrame.EXIT_ON_CLOSE);
 
-        pack();
+//        pack();
     }
 
 }

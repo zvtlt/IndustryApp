@@ -25,30 +25,41 @@ import java.nio.file.Files;
 import java.nio.file.Paths;
 import java.text.DecimalFormat;
 import java.util.ArrayList;
+import java.util.HashMap;
 import java.util.List;
 import java.util.Observable;
 
 public class Model extends Observable {
 
     private static Model model = null;
-    protected ProductedBlueprint productedBlueprint;
-    protected List<ComponentBlueprint> componentBlueprintList;
-    protected Total total;
-    protected boolean sub = false;
+    private ProductedBlueprint productedBlueprint;
+    private List<ComponentBlueprint> componentBlueprintList;
+    private Total total;
+    private boolean sub = false;
+    private int te = 0;
+    private int me = 0;
+    private int subTE = 0;
+    private int subME = 0;
+    private double finalTE;
+    private double finalME;
+    private double finalSubTE;
+    private double finalSubME;
+    private int station = 30000142;
     private String count = "";
 
-    protected final List<String> comboboxList;
+    private final List<String> comboboxList;
     private final List<TypeIDs> typeIDsList;
     private final List<Blueprints> blueprintsList;
+    private final HashMap<String, Integer> stationHashMap;
 
-    private Model() {
+    private Model(){
         typeIDsList = getTypeIDs();
         comboboxList = typeIDsGetList();
         blueprintsList = getBlueprints();
+        stationHashMap = getStationsHashMap();
     }
 
     public static Model getInstance(){
-
         if(model == null){
             model = new Model();
         }
@@ -58,7 +69,7 @@ public class Model extends Observable {
 
 
     //////////////////////////////// GET BLUEPRINTS LIST //////////////////////////////
-    public List<Blueprints> getBlueprints(){
+    private List<Blueprints> getBlueprints(){
 
         List<Blueprints> list = new ArrayList<>();
 
@@ -148,6 +159,20 @@ public class Model extends Observable {
         }
 
         return list;
+    }
+
+
+    ///////////////////////  CREATING HASHMAP FOR STATIONS NAME + ID ////////////////////////////////
+    private HashMap<String, Integer> getStationsHashMap(){
+
+        HashMap<String, Integer> hashmap = new HashMap<>();
+        hashmap.put("Jita", 30000142);
+        hashmap.put("Amarr", 30002187);
+        hashmap.put("Rens", 30002510);
+        hashmap.put("Hek", 30002053);
+        hashmap.put("Dodixie", 30002659);
+
+        return hashmap;
     }
 
 
@@ -313,6 +338,8 @@ public class Model extends Observable {
 
         ComponentBlueprint componentBlueprint = new ComponentBlueprint();
         List<ComponentBlueprint> resultList = new ArrayList<>();
+
+        finalME = 1 - ((double)me / 100);
         total = new Total();
 
         int componentID = typeIDsGetIDByName(bpName);
@@ -328,8 +355,47 @@ public class Model extends Observable {
                     componentBlueprint.setMaterialImage("images\\" + m.getTypeID() + "_32.png");
                     String componentName = typeIDsGetNameByID(m.getTypeID());
                     componentBlueprint.setMaterialName(componentName);
-                    double componentVolume = typeIDsGetVolumeByName(componentName);
+
+                    // UPDATING QUANTITY ACCORDING TO ME
+                    componentBlueprint.setMaterialQuantity((int) Math.ceil(componentBlueprint.getMaterialQuantity() * finalME));
+
                     // UPDATING VOLUME ACCORDING TO QUANTITY
+                    double componentVolume = typeIDsGetVolumeByName(componentName);
+                    componentBlueprint.setMaterialVolume(componentVolume * componentBlueprint.getMaterialQuantity());
+
+                    resultList.add(componentBlueprint);
+                    componentBlueprint = new ComponentBlueprint();
+                }
+            }
+        }
+        return resultList;
+    }
+
+
+    /////////////////////// RETURN BLUEPRINTFINAL ////////////////
+    private List<ComponentBlueprint> bpComponentsForSub(String bpName){
+
+        ComponentBlueprint componentBlueprint = new ComponentBlueprint();
+        List<ComponentBlueprint> resultList = new ArrayList<>();
+
+        total = new Total();
+
+        int componentID = typeIDsGetIDByName(bpName);
+
+
+        for (Blueprints b : blueprintsList) {
+
+            if (b.getBlueprintTypeID() == componentID) {
+
+                for (Materials m : b.getActivities().getManufacturing().getMaterials()) {
+                    componentBlueprint.setMaterialQuantity(m.getQuantity());
+                    componentBlueprint.setMaterialTypeID(m.getTypeID());
+                    componentBlueprint.setMaterialImage("images\\" + m.getTypeID() + "_32.png");
+                    String componentName = typeIDsGetNameByID(m.getTypeID());
+                    componentBlueprint.setMaterialName(componentName);
+
+                    // UPDATING VOLUME ACCORDING TO QUANTITY
+                    double componentVolume = typeIDsGetVolumeByName(componentName);
                     componentBlueprint.setMaterialVolume(componentVolume * componentBlueprint.getMaterialQuantity());
 
                     resultList.add(componentBlueprint);
@@ -346,6 +412,7 @@ public class Model extends Observable {
         List<ComponentBlueprint> subComponents;
         List<ComponentBlueprint> tempList = new ArrayList<>();
 
+        finalSubME = 1 - ((double)subME / 100);
         int quant = 0;
         String s;
 
@@ -354,12 +421,14 @@ public class Model extends Observable {
         componentBlueprintList.clear();
 
         for (ComponentBlueprint cbp : tempList) {
+
             componentBlueprintList.add(cbp);
             count += "a";
 
             s = cbp.getMaterialName() + " Blueprint";
 
-            subComponents = bpComponents(s);
+            subComponents = bpComponentsForSub(s);
+
 
             if(!subComponents.isEmpty()){
                 count = count.substring(0, count.length() - 1);
@@ -379,7 +448,17 @@ public class Model extends Observable {
 
                     sub.setMaterialQuantity((int) Math.ceil((float)cbp.getMaterialQuantity() / quant) * sub.getMaterialQuantity());
 
+                    // UPDATING QUANTITY ACCORDING TO ME
+                    if(!(cbp.getMaterialQuantity() == sub.getMaterialQuantity()))
+                        sub.setMaterialQuantity((int) Math.ceil(sub.getMaterialQuantity() * finalSubME));
+
+                    // UPDATING VOLUME ACCORDING TO QUANTITY
+                    String componentName = typeIDsGetNameByID(sub.getMaterialTypeID());
+                    double componentVolume = typeIDsGetVolumeByName(componentName);
+                    sub.setMaterialVolume(componentVolume * sub.getMaterialQuantity());
+
                     sub.setMaterialName("|____"+ sub.getMaterialName());
+                    sub.setSub(true);
                     componentBlueprintList.add(sub);
                     count += "b";
                 }
@@ -389,7 +468,7 @@ public class Model extends Observable {
 
 
     //////////////////////////////  JSON LIST FOR MARKET PRICE + UPDATING PRICES   //////////////////
-    private void jsonPriceUpdate(List<ComponentBlueprint> itInfo) throws IOException {
+    private void jsonPriceUpdate(List<ComponentBlueprint> itInfo){
         //        JSON LIST FOR MARKET PRICE
         String userprofile = System.getenv("USERPROFILE");
         File prices = new File(userprofile + "\\IndustryApp\\prices.json");
@@ -402,10 +481,10 @@ public class Model extends Observable {
             for (ComponentBlueprint bp : itInfo) {
                 for (EMPrices json : list) {
                     if (bp.getMaterialTypeID() == json.getType_id()) {
-                        bp.setBasePrice(json.getMedian_price());
+                        bp.setBasePrice(json.getMin_price());
                     }
                     if(productedBlueprint.getProductedTypeID() == json.getType_id()){
-                        productedBlueprint.setProductedPrice(json.getMedian_price());
+                        productedBlueprint.setProductedPrice(json.getMin_price());
                     }
                 }
             }
@@ -439,10 +518,10 @@ public class Model extends Observable {
             for (ComponentBlueprint bp : itInfo) {
                 for (EMPrices json : list) {
                     if (bp.getMaterialTypeID() == json.getType_id()) {
-                        bp.setBasePrice(json.getMedian_price());
+                        bp.setBasePrice(json.getMin_price());
                     }
                     if(productedBlueprint.getProductedTypeID() == json.getType_id()){
-                        productedBlueprint.setProductedPrice(json.getMedian_price());
+                        productedBlueprint.setProductedPrice(json.getMin_price());
                     }
                 }
             }
@@ -484,7 +563,7 @@ public class Model extends Observable {
             count ++;
         }
 
-        String url = "https://api.evemarketer.com/ec/marketstat?typeid=" + id;
+        String url = "https://api.evemarketer.com/ec/marketstat?typeid=" + id + "&usesystem=" + station;
         URL file = new URL(url);
         DocumentBuilderFactory documentBuilderFactory = DocumentBuilderFactory.newInstance();
         DocumentBuilder documentBuilder = documentBuilderFactory.newDocumentBuilder();
@@ -494,7 +573,7 @@ public class Model extends Observable {
         for(int i = 0 ; i < count ; i++) {
             Node node = nodeList.item(i);
             Element elem = (Element) node;
-            String res = elem.getElementsByTagName("median").item(0).getTextContent();
+            String res = elem.getElementsByTagName("min").item(0).getTextContent();
             float res2 = Float.parseFloat(res);
 
             if(i == 0)
@@ -526,7 +605,7 @@ public class Model extends Observable {
             size ++;
         }
 
-        String url = "https://api.evemarketer.com/ec/marketstat?typeid=" + id;
+        String url = "https://api.evemarketer.com/ec/marketstat?typeid=" + id + "&usesystem=" + station;
         URL file = new URL(url);
         DocumentBuilderFactory documentBuilderFactory = DocumentBuilderFactory.newInstance();
         DocumentBuilder documentBuilder = documentBuilderFactory.newDocumentBuilder();
@@ -536,7 +615,7 @@ public class Model extends Observable {
         for(int i = 0 ; i < size ; i++) {
             Node node = nodeList.item(i);
             Element elem = (Element) node;
-            String res = elem.getElementsByTagName("median").item(0).getTextContent();
+            String res = elem.getElementsByTagName("min").item(0).getTextContent();
             float res2 = Float.parseFloat(res);
 
             if(i == 0)
@@ -604,7 +683,7 @@ public class Model extends Observable {
             }else if(modres == 0){
                 id += "," + tID;
                 try {
-                    url = "https://api.evemarketer.com/ec/marketstat?typeid=" + id;
+                    url = "https://api.evemarketer.com/ec/marketstat?typeid=" + id + "&usesystem=" + station;
                     file = new URL(url);
                     DocumentBuilderFactory documentBuilderFactory = DocumentBuilderFactory.newInstance();
                     DocumentBuilder documentBuilder = documentBuilderFactory.newDocumentBuilder();
@@ -614,8 +693,8 @@ public class Model extends Observable {
                     for(int i = 0 ; i < subcount ; i++) {
                         Node node = nodeList.item(i);
                         Element elem = (Element) node;
-                        String res = elem.getElementsByTagName("median").item(0).getTextContent();
-                        response.append("{\"median_price\":" + res + ",\"type_id\":}," + System.lineSeparator());
+                        String res = elem.getElementsByTagName("min").item(0).getTextContent();
+                        response.append("{\"min_price\":" + res + ",\"type_id\":}," + System.lineSeparator());
                     }
 
                     id ="";
@@ -633,7 +712,7 @@ public class Model extends Observable {
         }
 
         try {
-            url = "https://api.evemarketer.com/ec/marketstat?typeid=" + id;
+            url = "https://api.evemarketer.com/ec/marketstat?typeid=" + id + "&usesystem=" + station;
             file = new URL(url);
             DocumentBuilderFactory documentBuilderFactory = DocumentBuilderFactory.newInstance();
             DocumentBuilder documentBuilder = documentBuilderFactory.newDocumentBuilder();
@@ -645,9 +724,9 @@ public class Model extends Observable {
             for(int i = 0 ; i < subcount ; i++) {
                 Node node = nodeList.item(i);
                 Element elem = (Element) node;
-                String res = elem.getElementsByTagName("median").item(0).getTextContent();
+                String res = elem.getElementsByTagName("min").item(0).getTextContent();
 
-                response.append("{\"median_price\":" + res + ",\"type_id\":}," + System.lineSeparator());
+                response.append("{\"min_price\":" + res + ",\"type_id\":}," + System.lineSeparator());
             }
 
         }catch (Exception e){
@@ -880,12 +959,25 @@ public class Model extends Observable {
 
     ////////////////////// GETTERS AND SETTERS //////////////////////
 
+
+    public List<Blueprints> getBlueprintsList() {
+        return blueprintsList;
+    }
+
     public ProductedBlueprint getProductedBlueprint() {
         return productedBlueprint;
     }
 
     public List<ComponentBlueprint> getComponentBlueprintList() {
         return componentBlueprintList;
+    }
+
+    public List<String> getComboboxList() {
+        return comboboxList;
+    }
+
+    public HashMap<String, Integer> getStationHashMap() {
+        return stationHashMap;
     }
 
     public Total getTotal() {
@@ -902,5 +994,29 @@ public class Model extends Observable {
 
     public void setSub(boolean sub) {
         this.sub = sub;
+    }
+
+    public void setTe(int te) {
+        this.te = te;
+    }
+
+    public void setMe(int me) {
+        this.me = me;
+    }
+
+    public void setSubTE(int subTE) {
+        this.subTE = subTE;
+    }
+
+    public void setSubME(int subME) {
+        this.subME = subME;
+    }
+
+    public int getStation() {
+        return station;
+    }
+
+    public void setStation(int station) {
+        this.station = station;
     }
 }

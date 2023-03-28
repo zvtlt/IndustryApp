@@ -9,6 +9,7 @@ public class ComponentBlueprint {
     private double materialVolume;
     private float basePrice = 0.0f;
     private float multPrice = 0.0f;
+    private boolean sub = false;
 
     private String basePriceString;
     private String multPriceString;
@@ -104,6 +105,14 @@ public class ComponentBlueprint {
         this.materialQuantityString = materialQuantityString;
     }
 
+    public boolean isSub() {
+        return sub;
+    }
+
+    public void setSub(boolean sub) {
+        this.sub = sub;
+    }
+
     @Override
     public String toString() {
         return "ComponentBlueprint{" +
@@ -114,6 +123,7 @@ public class ComponentBlueprint {
                 ", materialVolume=" + materialVolume +
                 ", basePrice=" + basePrice +
                 ", multPrice=" + multPrice +
+                ", sub=" + sub +
                 ", basePriceString='" + basePriceString + '\'' +
                 ", multPriceString='" + multPriceString + '\'' +
                 ", materialVolumeString='" + materialVolumeString + '\'' +

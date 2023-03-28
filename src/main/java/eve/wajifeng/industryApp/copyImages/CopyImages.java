@@ -22,7 +22,7 @@ public class CopyImages {
     Model model = Model.getInstance();
     String bpID;
 
-        for(Blueprints bp : model.getBlueprints()){
+        for(Blueprints bp : model.getBlueprintsList()){
 
             try{
                 for(Products p : bp.getActivities().getManufacturing().getProducts()){
@@ -53,7 +53,6 @@ public class CopyImages {
                     } catch (IOException e) {
                         e.printStackTrace();
                     }
-
                 }
             }catch (Exception em) {
                 em.printStackTrace();
