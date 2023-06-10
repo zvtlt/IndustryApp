@@ -17,7 +17,8 @@ public class FormatTypeIDs {
 
     private void modifyFileV1(String s) throws Exception {
         File file1 = new File(s);
-        File file2 = new File("src/main/resources/yaml/typeIDs/typeIDsNewVersion.yaml");
+        File file2 = new File("." + File.separator + "src" + File.separator + "main" + File.separator + "resources" +
+                File.separator + "yaml" + File.separator + "typeIDs" + File.separator + "typeIDsNewVersion.yaml");
 
         StringBuilder originalContent = new StringBuilder();
         try (BufferedReader reader = new BufferedReader(new FileReader(file1))) {
@@ -43,7 +44,8 @@ public class FormatTypeIDs {
     }
 
     private void modifyFileV2() throws Exception {
-        File file = new File("src/main/resources/yaml/typeIDs/typeIDsNewVersion.yaml");
+        File file = new File("." + File.separator + "src" + File.separator + "main" + File.separator + "resources" +
+                File.separator + "yaml" + File.separator + "typeIDs" + File.separator + "typeIDsNewVersion.yaml");
 
         StringBuilder originalContent = new StringBuilder();
         try (BufferedReader reader = new BufferedReader(new FileReader(file))) {
@@ -70,7 +72,8 @@ public class FormatTypeIDs {
     }
 
     private void modifyFileV3() throws Exception {
-        File file = new File("src/main/resources/yaml/typeIDs/typeIDsNewVersion.yaml");
+        File file = new File("." + File.separator + "src" + File.separator + "main" + File.separator + "resources" +
+                File.separator + "yaml" + File.separator + "typeIDs" + File.separator + "typeIDsNewVersion.yaml");
 
         StringBuilder originalContent = new StringBuilder();
         try (BufferedReader reader = new BufferedReader(new FileReader(file))) {
@@ -96,7 +99,8 @@ public class FormatTypeIDs {
     }
 
     private void modifyFileV4() throws Exception {
-        File file = new File("src/main/resources/yaml/typeIDs/typeIDsNewVersion.yaml");
+        File file = new File("." + File.separator + "src" + File.separator + "main" + File.separator + "resources" +
+                File.separator + "yaml" + File.separator + "typeIDs" + File.separator + "typeIDsNewVersion.yaml");
 
         StringBuilder originalContent = new StringBuilder();
         try (BufferedReader reader = new BufferedReader(new FileReader(file))) {
@@ -119,9 +123,12 @@ public class FormatTypeIDs {
     }
 
     private void modifyFileV5() throws Exception {
-        File file1 = new File("src/main/resources/yaml/typeIDs/typeIDsNewVersion.yaml");
-        File file2 = new File("src/main/resources/yaml/typeIDs/typeIDs1.yaml");
-        File file3 = new File("src/main/resources/yaml/typeIDs/typeIDs2.yaml");
+        File file1 = new File("." + File.separator + "src" + File.separator + "main" + File.separator + "resources" +
+                File.separator + "yaml" + File.separator + "typeIDs" + File.separator + "typeIDsNewVersion.yaml");
+        File file2 = new File("." + File.separator + "src" + File.separator + "main" + File.separator + "resources" +
+                File.separator + "yaml" + File.separator + "typeIDs" + File.separator + "typeIDs1.yaml");
+        File file3 = new File("." + File.separator + "src" + File.separator + "main" + File.separator + "resources" +
+                File.separator + "yaml" + File.separator + "typeIDs" + File.separator + "typeIDs2.yaml");
 
 
         StringBuilder originalContent = new StringBuilder();

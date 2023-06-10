@@ -324,7 +324,7 @@ public class Model extends Observable {
 
                     resultProducted.setProductedQuantity(p.getQuantity());
                     resultProducted.setProductedTypeID(p.getTypeID());
-                    resultProducted.setProductedImage("images\\" + p.getTypeID() + "_32.png");
+                    resultProducted.setProductedImage("images/" + p.getTypeID() + "_32.png");
 
                 }
             }
@@ -352,7 +352,7 @@ public class Model extends Observable {
                 for (Materials m : b.getActivities().getManufacturing().getMaterials()) {
                     componentBlueprint.setMaterialQuantity(m.getQuantity());
                     componentBlueprint.setMaterialTypeID(m.getTypeID());
-                    componentBlueprint.setMaterialImage("images\\" + m.getTypeID() + "_32.png");
+                    componentBlueprint.setMaterialImage("images/" + m.getTypeID() + "_32.png");
                     String componentName = typeIDsGetNameByID(m.getTypeID());
                     componentBlueprint.setMaterialName(componentName);
 
@@ -390,7 +390,7 @@ public class Model extends Observable {
                 for (Materials m : b.getActivities().getManufacturing().getMaterials()) {
                     componentBlueprint.setMaterialQuantity(m.getQuantity());
                     componentBlueprint.setMaterialTypeID(m.getTypeID());
-                    componentBlueprint.setMaterialImage("images\\" + m.getTypeID() + "_32.png");
+                    componentBlueprint.setMaterialImage("images/" + m.getTypeID() + "_32.png");
                     String componentName = typeIDsGetNameByID(m.getTypeID());
                     componentBlueprint.setMaterialName(componentName);
 
@@ -471,7 +471,7 @@ public class Model extends Observable {
     private void jsonPriceUpdate(List<ComponentBlueprint> itInfo){
         //        JSON LIST FOR MARKET PRICE
         String userprofile = System.getenv("USERPROFILE");
-        File prices = new File(userprofile + "\\IndustryApp\\prices.json");
+        File prices = new File(userprofile + File.separator + "IndustryApp" + File.separator + "prices.json");
 
         //        UPDATING BASEPRICE, MULTPRICE AND TOTALPRICE VALUE WITH JSON
         try {
@@ -508,7 +508,7 @@ public class Model extends Observable {
     private void jsonPriceUpdateSubComp(List<ComponentBlueprint> itInfo){
         //        JSON LIST FOR MARKET PRICE
         String userprofile = System.getenv("USERPROFILE");
-        File prices = new File(userprofile + "\\IndustryApp\\prices.json");
+        File prices = new File(userprofile + File.separator + "IndustryApp" + File.separator + "prices.json");
 
         //        UPDATING BASEPRICE, MULTPRICE AND TOTALPRICE VALUE WITH JSON
         try {
@@ -662,7 +662,7 @@ public class Model extends Observable {
         int modres;
 
         String userprofile = System.getenv("USERPROFILE");
-        Files.createDirectories(Paths.get(userprofile + "\\IndustryApp"));
+        Files.createDirectories(Paths.get(userprofile + File.separator + "IndustryApp"));
 
         String id ="";
 
@@ -735,7 +735,7 @@ public class Model extends Observable {
 
         response.append("]");
 
-        File prices = new File(userprofile + "\\IndustryApp\\prices.json");
+        File prices = new File(userprofile + File.separator + "IndustryApp" + File.separator + "prices.json");
         String res = response.substring(0, response.length() - 4) + "]";
 
         try (FileWriter writer = new FileWriter(prices)) {
@@ -747,7 +747,7 @@ public class Model extends Observable {
     private void updateJsonEM2(){
 
         String userprofile = System.getenv("USERPROFILE");
-        File prices = new File(userprofile + "\\IndustryApp\\prices.json");
+        File prices = new File(userprofile + File.separator + "IndustryApp" + File.separator + "prices.json");
 
         List<Integer> list = usefullID();
         int id = 0;
