@@ -4,6 +4,10 @@ import javax.swing.*;
 import javax.swing.table.DefaultTableCellRenderer;
 import javax.swing.table.DefaultTableModel;
 import java.awt.*;
+import java.io.File;
+import java.io.IOException;
+import java.io.InputStream;
+import java.net.URL;
 import java.util.List;
 import java.util.Observable;
 import java.util.Observer;
@@ -49,10 +53,17 @@ public class Vue extends JPanel implements Observer {
         Object[][] data = new Object[len][6];
         List<ComponentBlueprint> componentBlueprintList = model.getComponentBlueprintList();
         Icon bpImage;
-        String location = "E:\\Dev\\IntelliJ\\IndustryApp\\src\\main\\resources\\";
         for(ComponentBlueprint cbp : componentBlueprintList){
-            bpImage = new ImageIcon(location + cbp.getMaterialImage());
-            data[count][0] = bpImage;
+
+            try {
+                URL url = Vue.class.getClassLoader().getResource(cbp.getMaterialImage());
+                bpImage = new ImageIcon(url);
+
+                data[count][0] = bpImage;
+            }catch (Exception e){
+                e.printStackTrace();
+            }
+
             data[count][1] = cbp.getMaterialName();
             data[count][2] = cbp.getMaterialQuantityString();
             data[count][3] = cbp.getMaterialVolumeString();
@@ -147,8 +158,14 @@ public class Vue extends JPanel implements Observer {
         String[] header3 = {"", "Name", "Quantity", "Volume", "Base Price"};
         Object[][] data3 = new Object[1][5];
 
-        bpImage = new ImageIcon(location + model.getProductedBlueprint().getProductedImage());
-        data3[0][0] = bpImage;
+        try {
+            URL url = Vue.class.getClassLoader().getResource(model.getProductedBlueprint().getProductedImage());
+            bpImage = new ImageIcon(url);
+
+            data3[0][0] = bpImage;
+        }catch (Exception e){
+        }
+
         data3[0][1] = model.getProductedBlueprint().getProductedName();
         data3[0][2] = model.getProductedBlueprint().getProductedQuantityString();
         data3[0][3] = model.getProductedBlueprint().getProductedVolumeString();

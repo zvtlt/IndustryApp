@@ -184,6 +184,23 @@ public class Controlleur extends JPanel {
         comboBoxStation.addActionListener(new comboboxStationActionListener());
     }
 
+    private void updateView(){
+        if(!model.isSub()) {
+            try {
+                model.bpFinalFormated((String)comboBox.getSelectedItem());
+            } catch (Exception ex){
+                ex.printStackTrace();
+            }
+        }
+        else {
+            try {
+                model.bpSubFinalFormated((String)comboBox.getSelectedItem());
+            } catch (Exception ex){
+                ex.printStackTrace();
+            }
+        }
+    }
+
     private class donneeDocumentListener implements DocumentListener{
 
         @Override
@@ -249,21 +266,7 @@ public class Controlleur extends JPanel {
 
         @Override
         public void actionPerformed(ActionEvent e) {
-            String selection = (String)comboBox.getSelectedItem();
-
-            if(!model.isSub()){
-                try {
-                    model.bpFinalFormated(selection);
-                } catch (Exception ex){
-                    ex.printStackTrace();
-                }
-            }else{
-                try {
-                    model.bpSubFinalFormated(selection);
-                } catch (Exception ex){
-                    ex.printStackTrace();
-                }
-            }
+            updateView();
         }
     }
 
@@ -298,20 +301,7 @@ public class Controlleur extends JPanel {
         public void stateChanged(ChangeEvent e) {
             model.setTe((int)spinnerTE.getValue());
 
-            if(model.isSub()) {
-                try {
-                    model.bpFinalFormated((String)comboBox.getSelectedItem());
-                } catch (Exception ex){
-                    ex.printStackTrace();
-                }
-            }
-            else {
-                try {
-                    model.bpSubFinalFormated((String)comboBox.getSelectedItem());
-                } catch (Exception ex){
-                    ex.printStackTrace();
-                }
-            }
+            updateView();
         }
     }
 
@@ -321,20 +311,7 @@ public class Controlleur extends JPanel {
         public void stateChanged(ChangeEvent e) {
             model.setMe((int)spinnerME.getValue());
 
-            if(!model.isSub()) {
-                try {
-                    model.bpFinalFormated((String)comboBox.getSelectedItem());
-                } catch (Exception ex){
-                    ex.printStackTrace();
-                }
-            }
-            else {
-                try {
-                    model.bpSubFinalFormated((String)comboBox.getSelectedItem());
-                } catch (Exception ex){
-                    ex.printStackTrace();
-                }
-            }
+            updateView();
         }
     }
 
@@ -342,22 +319,9 @@ public class Controlleur extends JPanel {
 
         @Override
         public void stateChanged(ChangeEvent e) {
-            model.setSubME((int)subSpinnerME.getValue());
+            model.setSubTE((int)subSpinnerTE.getValue());
 
-            if(!model.isSub()) {
-                try {
-                    model.bpFinalFormated((String)comboBox.getSelectedItem());
-                } catch (Exception ex){
-                    ex.printStackTrace();
-                }
-            }
-            else {
-                try {
-                    model.bpSubFinalFormated((String)comboBox.getSelectedItem());
-                } catch (Exception ex){
-                    ex.printStackTrace();
-                }
-            }
+            updateView();
         }
     }
 
@@ -367,20 +331,7 @@ public class Controlleur extends JPanel {
         public void stateChanged(ChangeEvent e) {
             model.setSubME((int)subSpinnerME.getValue());
 
-            if(!model.isSub()) {
-                try {
-                    model.bpFinalFormated((String)comboBox.getSelectedItem());
-                } catch (Exception ex){
-                    ex.printStackTrace();
-                }
-            }
-            else {
-                try {
-                    model.bpSubFinalFormated((String)comboBox.getSelectedItem());
-                } catch (Exception ex){
-                    ex.printStackTrace();
-                }
-            }
+            updateView();
         }
     }
 
@@ -390,20 +341,7 @@ public class Controlleur extends JPanel {
         public void actionPerformed(ActionEvent e) {
             model.setStation(model.getStationHashMap().get(comboBoxStation.getSelectedItem()));
 
-            if(!model.isSub()) {
-                try {
-                    model.bpFinalFormated((String)comboBox.getSelectedItem());
-                } catch (Exception ex){
-                    ex.printStackTrace();
-                }
-            }
-            else {
-                try {
-                    model.bpSubFinalFormated((String)comboBox.getSelectedItem());
-                } catch (Exception ex){
-                    ex.printStackTrace();
-                }
-            }
+            updateView();
         }
     }
 

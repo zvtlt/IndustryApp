@@ -14,7 +14,8 @@ public class FormatBlueprints {
 
     private void modifyFile1(String s) throws Exception {
         File file1 = new File(s);
-        File file2 = new File("src/main/resources/yaml/blueprints/blueprintsNewVersion.yaml");
+        File file2 = new File("." + File.separator + "src" + File.separator + "main" + File.separator + "resources" +
+                File.separator + "yaml" + File.separator + "blueprints" + File.separator + "blueprintsNewVersion.yaml");
 
         StringBuilder originalContent = new StringBuilder();
         try (BufferedReader reader = new BufferedReader(new FileReader(file1))) {
@@ -40,10 +41,14 @@ public class FormatBlueprints {
     }
 
     private void modifyFile2() throws Exception {
-        File file1 = new File("src/main/resources/yaml/blueprints/blueprintsNewVersion.yaml");
-        File file2 = new File("src/main/resources/yaml/blueprints/blueprints1.yaml");
-        File file3 = new File("src/main/resources/yaml/blueprints/blueprints2.yaml");
-        File file4 = new File("src/main/resources/yaml/blueprints/blueprints3.yaml");
+        File file1 = new File("." + File.separator + "src" + File.separator + "main" + File.separator + "resources" +
+                File.separator + "yaml" + File.separator + "blueprints" + File.separator + "blueprintsNewVersion.yaml");
+        File file2 = new File("." + File.separator + "src" + File.separator + "main" + File.separator + "resources" +
+                File.separator + "yaml" + File.separator + "blueprints" + File.separator + "blueprints1.yaml");
+        File file3 = new File("." + File.separator + "src" + File.separator + "main" + File.separator + "resources" +
+                File.separator + "yaml" + File.separator + "blueprints" + File.separator + "blueprints2.yaml");
+        File file4 = new File("." + File.separator + "src" + File.separator + "main" + File.separator + "resources" +
+                File.separator + "yaml" + File.separator + "blueprints" + File.separator + "blueprints3.yaml");
 
         StringBuilder originalContent = new StringBuilder();
         try (BufferedReader reader = new BufferedReader(new FileReader(file1))) {

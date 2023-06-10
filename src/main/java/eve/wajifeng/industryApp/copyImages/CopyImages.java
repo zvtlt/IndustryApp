@@ -13,22 +13,24 @@ public class CopyImages {
 
     public void copy(){
 
-    String sourceString = "E:\\Dev\\Eve\\Ressources\\Invasion_1.0_Types\\Types";
-    String destString = "src\\main\\resources\\images";
+        String sourceString = "E:" + File.separator + "Dev" + File.separator + "Eve" + File.separator + "Ressources"
+                + File.separator + "Invasion_1.0_Types" + File.separator + "Types";
+        String destString = "." + File.separator + "src" + File.separator + "main" + File.separator + "resources" +
+                File.separator + "images";
 
-    File source;
-    File dest;
+        File source;
+        File dest;
 
-    Model model = Model.getInstance();
-    String bpID;
+        Model model = Model.getInstance();
+        String bpID;
 
         for(Blueprints bp : model.getBlueprintsList()){
 
             try{
                 for(Products p : bp.getActivities().getManufacturing().getProducts()){
                     bpID = String.valueOf(p.getTypeID());
-                    source = new File(sourceString + "\\" + bpID + "_32.png");
-                    dest = new File(destString + "\\" + bpID + "_32.png");
+                    source = new File(sourceString + File.separator + bpID + "_32.png");
+                    dest = new File(destString + File.separator + bpID + "_32.png");
 
                     try {
                         if(!dest.exists())
@@ -44,8 +46,8 @@ public class CopyImages {
             try{
                 for(Materials m : bp.getActivities().getManufacturing().getMaterials()){
                     bpID = String.valueOf(m.getTypeID());
-                    source = new File(sourceString + "\\" + bpID + "_32.png");
-                    dest = new File(destString + "\\" + bpID + "_32.png");
+                    source = new File(sourceString + File.separator + bpID + "_32.png");
+                    dest = new File(destString + File.separator + bpID + "_32.png");
 
                     try {
                         if(!dest.exists())
